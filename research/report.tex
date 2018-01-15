@@ -260,7 +260,7 @@ $$\nabla _{w}J = \textbf{w} + \sum_{i=0}^{I}(\textbf{HMX}_{b}')^{T}\textbf{O}^{-
 
 One of the main advantages of En4DVAR is the relaxation of the requirement to have tangent linear model or adjoint model during the implementation. The experiments performed by ... on the shallow water demonstrated that it can  provide the results similar to those which use both with some benefits of the smaller computational cost. Moreover, En4DVAR proved to give reasonable results in comparison with 3DVAR, 4DVAR, EnKF schemes. Also, the non-sequential nature of En4DVAR also leads to the adequate data assimilation method accumulating some unbalance conditions.  
 
-\subsection{IEnKS}
+\subsection{IEnKS for Don Max}
 
 We define the observation vector as $\textbf{y} \in \Re^{d}$ and assume that it is obtained at every time step $\delta t$. We obtain the analysis of IEnKS over $[t, t_{l}]$ using the cost function
 
@@ -281,6 +281,16 @@ $$\nabla \tilde{J}_{(j)} = -\sum_{k=1}^{L}\beta_{k}\textbf{Y}_{k,(j)}^{T}\textbf
 $$\tilde{H}_{j}=(N-1)\textbf{I}_{N}+\sum_{k=1}^{L} \beta_{k} \textbf{Y}_{k,(j)}^{T}\textbf{R}^{-1}_{k} \textbf{Y}_{k,(j)} $$
 
 $$\textbf{x}_{0}^{(j)} = \textbf{x}_{0}^{(0)} + \textbf{A}_{0}\textbf{w}^{(j)}$$
+
+\subsection{3DVAR+EnKF}
+Here we define $\textbf{x}$ to be the model state vector, $\textbf{y}^{o}$ the set of observations, $\textbf{x}^{b}$ the background forecast, $\textbf{x}^{a}$ the analysis. We formulate the cost function for the minimiser $x$ using 3DVAR as follows,
+
+$$J(x) = \frac{1}{2}[(x-x^{b})^{T}\textbf{B}^{-1}(\textbf{x}-\textbf{x}^{b})+(\textbf{y}^{o}-\textbf{H}\textbf{x})^{T}\textbf{R}^{-1}(\textbf{y}^{o}-\textbf{Hx})]$$
+
+where $\textbf{B}$ is the background error covariances estimation, $\textbf{R}$ is the matrix containing observation errors and $\textbf{H}$ is the mapping operator for the model state onto the observations and  $\textbf{R}$ is the measurement error covariance. The relation between $\textbf{x}^{t}$ and $\textbf{y}^{o}$ is, thus, $$\textbf{y}^{o} = \textbf{H}\textbf{x}^{t} + \epsilon$$ where $\epsilon$ is the random vector, distributed according to the normal distribution, with zero mean and covariance matrix $\textbf{R}$. The increment $\textbf{x}^{a} - \textbf{x}^{b}$ satisfies, 
+$$(\textbf{I} + \textbf{BH}^{T}\textbf{R}^{-1}\textbf{H})(\textbf{x}^{a}-\textbf{x}^{b}) = \textbf{B}\textbf{H}^{T}\textbf{R}^{-1}(\textbf{y}^{o}-\textbf{H}\textbf{x}^{b})$$   
+
+Under 3DVAR we use some assumptions to calculate $\textbf{B}$. Namely, (i) $\textbf{B}$ is fixed in time, (ii) $\textbf{B}$ is diagonal in horizontal spectral coefficients, i.e. $\textbf{B} = \textbf{S}\textbf{C}\textbf{S}^{T}$, where $\textbf{S}$ is the transformation for spectral coefficients to grid points (iii) $\textbf{B}$ has horizontal and vertical structures which can be separated. 
 
 
 \end{document}
