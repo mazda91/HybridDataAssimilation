@@ -1,0 +1,14 @@
+Report plan & ppt (some ideas):
+
+for what I have seen from all our articles we have four hybrid methods to present:
+
+3DVAR+EKM (extended Kalman filter) Michi
+4DVAR+EnKF (ensemble) KS
+3DVAR+EnKF KS
+Some fuck smoothing thing Don Max
+
+I think it's good idea to try to make ppt around this. And report too.
+
+We all will have different notations for the same thing, so important thing, is to mention it, e.g. "in this section we follow the notation from the blabla" and tp state these notations. Also, good idea is to do not forget to mention what are the advantages and disadvatages for the hybrid scheme you describe.
+
+Lastly, but not the least: during the presentation we have the chance to talk about the things we understand. Hence, let's try to do not mention anything we don't:) like that we avoid the fuck up with the QA part
