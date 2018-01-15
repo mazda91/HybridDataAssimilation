@@ -136,4 +136,151 @@
 
 \maketitle
 
+\section{KseniaDRaft}
+\subsection{EnKF}
+Ensemble Kalman Filter (EnKF) has been first introduced by Evensen (1994b) and gained its wide use due to its relatively easy concepts, formulation and implementation. For instance, there is no requirements of derivation of neither tangent linear operator nor adjoint equations, and no integration backward in time.
+
+The Kalman Filter is a method where the model requires only forward integration in time and it reinitialised every time the measurements are available. Hereafter, we use the following notations: $\psi^{f}$ is the model forecast, $\psi^{a}$ is the model analysis, $\textbf{d}$ is the vector containing the measurements, $\textbf{P}^{f}$ is the covariance for the model forecast, $\textbf{P}^{a}$ is the covariance for the model analysis and $\textbf{R}$ is the covariance for the model measurements, $\textbf{H}$ is the measurement operator relating to the true model state $\psi ^{t}$ to $\textbf{d}$ with possibility to have the measurement errors $\epsilon$. We now state the analysis equation:
+
+$$\psi ^{a} = \psi ^{f} + \textbf{P} ^{f}\textbf{H} ^{T}(\textbf{HP} ^{f}\textbf{H} ^{T}+\textbf{R}) ^{-1}(\textbf{d-H}\psi) ^{f}$$
+
+with
+
+$$\textbf{P}^{a} = \textbf{P}^{f} - \textbf{P}^{f}\textbf{H}^{T}(\textbf{HP}^{f}\textbf{H}^{T}+\textbf{R})^{-1}\textbf{HP}^{f} $$
+
+and 
+
+$$\textbf{d} = \textbf{H}\psi{t} + \epsilon$$
+
+We determine the reinitialisation $\psi{a}$ as a weighted linear combination of $\psi{f}$, $\textbf{P}^{f}$ and $\textbf{H}^{T}$. We can calculate the weights using the error covariance for the model prediction projected onto the measurements, the measurement error covariance and the innovation (i.e. the difference between prediction and measurements).     
+
+We next define the Kalman gain matrix which is used to solve the equations related to the time evolution of the error covariance matrix of the model state
+
+$\textbf{K} = \textbf{P}^{f}\textbf{H}^{T}(\textbf{H}\textbf{P}^{f}\textbf{H}^{T}+\textbf{R})^{-1}$
+
+Further, writing the linear dynamical model in discrete form $\psi_{k+1}=\textbf{F}\psi{k}$, we have the following equation for the error covariance
+
+$$\textbf{P}_{k+1}=\textbf{F}\textbf{P}_{k}\textbf{F}^{T}+\textbf{Q}$$
+where \textbf{Q} is the model error covariance matrix. These errors normally arise due to the relaxation of physics and numerical approximations. Integrating the last two equations we get $\psi{f}$ and $\textbf{P}^{f}$. This process is known to be the Kalman Filter.
+
+Contrary, writing the non-linear model for $\psi_{k+1}$
+
+$$\psi_{k+1}=\textbf{f}(\psi_{k})$$
+
+we obtain the Extended Kalman Filter with $\textbf{F}$ being the tangent linear operator, i.e. Jacobian, of $\textbf{f}(\psi)$.
+
+We now switch to the ensemble Kalman filter presentation. We first define the error statistics using an ensemble of model states, then an alternative definition of the error covariance equation to predict the error statistics and lastly, we present relevant analysis scheme.
+
+We use the true state to define the error covariance matrices for $\textbf{P}^{f}$ and $\textbf{P}^{a}$ using the expectation value 
+
+$$\textbf{P}^{f} = \overline{(\psi^{f}-\psi^{t})(\psi^{f}-\psi^{t})^{T}}$$
+
+$$\textbf{P}^{a} = \overline{(\psi^{a}-\psi^{t})(\psi^{a}-\psi^{t})^{T}}$$
+
+where $\psi ^{f}$, $\psi ^{a}$, $\psi ^{t}$ are the model state vectors at certain time point for the forecast, analysis and true state, respectively.
+
+The true state, $\psi ^{t}$, is not known, hence, we redefine above two equations using the ensemble covariance matrices around the mean value $\psi$ and average over ensemble. 
+
+$$\textbf{P}^{f} \simeq \textbf{P}^{f}_{e} = \overline{(\psi^{f}-\bar{\psi^{f}})(\psi^{f}-\bar{\psi^{f}})^{T}}$$
+
+$$\textbf{P}^{a} \simeq \textbf{P}^{a}_{e}= \overline{ (\psi^{a}-\bar {\psi^{a}})(\psi^{a}-\bar{\psi^{a}})^{T} }$$
+
+Thus, we assume that the ensemble mean $\overline {\psi}$ is the best estimate  and we are looking for the error in ensemble mean as the spread around the mean.
+
+Now, to define the ensemble Kalman filter analysis scheme using the definition of $\textbf{P}^{f}_{e}$ and $\textbf{P}^{a}_{e}$.
+
+The ensemble of observations state:
+
+$$\textbf{d}_{j} = \textbf{d} + \epsilon_{j}$$
+
+and ensemble covariance matrix $\textbf{R}_{e}$ converges to $\textbf{R}$ as ensemble goes to infinity and defined as 
+
+$$\textbf{R}_{e} = \overline{\epsilon \epsilon ^{T}}$$
+
+We rewrite the analysis step which now is updated by every model state ensemble number
+
+$$\psi ^{a} _{j}= \psi ^{f}_{j} + \textbf{P} _{e} ^{f}\textbf{H} ^{T}(\textbf{HP}_{e} ^{f}\textbf{H} ^{T}+\textbf{R}_{e}) ^{-1}(\textbf{d}_{j}-\textbf{H}\psi ^{f}_{j})$$
+
+It is worth to note that the matrices $\textbf{H}\textbf{P}^{f}_{e}\textbf{H}^{T}$ and $\textbf{R}_{e}$ are singular as long as we have number of measurements larger number of ensembles and hence, we have to use pseudo inversion. Also, the equation above for the $\psi ^{a} _{j}$ is approximation when we have finite number of ensemble members. Moreover, noting $\textbf{d} = \overline{\textbf{d}}$ as the initial guess vector of measurements, we have
+
+$$\overline{\psi ^{a}} = \overline{\psi ^{f}} + \textbf{P} ^{f}_{e}\textbf{H} ^{T}(\textbf{HP}_{e} ^{f}\textbf{H} ^{T}+\textbf{R}_{e}) ^{-1}(\overline{\textbf{d}}-\textbf{H}\overline{\psi ^{f}})$$
+
+Thus, we can see that we have similar relation between analysis and forecast in ensemble scheme as we do in Kalman filter, keeping in mind that we use ensemble mean in ensemble Kalman filter scheme.
+
+Using the definition of Kalman gain $$\textbf{K}_{e} = \textbf{P}_{e}^{f}\textbf{H}^{T}(\textbf{H}\textbf{P}^{f}_{e}\textbf{H}^{T}+\textbf{R}_{e})^{-1}$$ and subtracting $\overline{\psi_{j}^{a}}$ from $\psi_{j}^{a}$ we have
+
+$$\psi_{j}^{a}-\overline{\psi}^{a} = (\textbf{I}-\textbf{K}_{e}\textbf{H})(\psi_{j}^{f} - \overline{\psi}^{f})+\textbf{K}_{e}(\textbf{d}_{j}-\overline{\textbf{d}})$$
+
+and we derive the error covariance as follows,
+
+$$\textbf{P}_{e}^{a} = \overline {(\psi^{a} - \overline{\psi{a}})(\psi{a} - \overline{\psi^{a}})^{T}} = (\textbf{I}-\textbf{K}_{e}\textbf{H})\textbf{P}_{e}^{f}(\textbf{I}-\textbf{H}^{T}\textbf{K}_{e}^{T})+\textbf{K}_{e}\textbf{R}_{e}\textbf{K}_{e}^{T}=\textbf{P}_{e}^{f} - \textbf{K}_{e}\textbf{H}\textbf{P}_{e}^{f} - \textbf{P}_{e}^{f}\textbf{H}^{T}\textbf{K}_{e}^{T} + \textbf{K}_{e}(\textbf{H}\textbf{P}_{e}^{f}\textbf{H}^{T}+\textbf{R}_{e})\textbf{K}_{e}^{T} = (\textbf{I}-\textbf{K}_{e}\textbf{H})\textbf{P}_{e}^{f}$$ 
+
+The last expression is the Kalman filter minimum variance error covariance. Thus, if we have infinite number of ensembles, the ensemble Kalman filter provides the same result as Kalman filter and extended Kalman filter.
+
+\subsection{Incremental 4DVAR}
+copy from the internship report
+
+\subsection{En4DVAR algorithm}
+
+$$\textbf{X}'_{b}=\frac{1}{\sqrt{N-1}}(\textbf{x}_{b1}-\overline{\textbf{x}_{b}},\textbf{x}_{b2}-\overline{\textbf{x}_{b}},......,\textbf{x}_{bN}-\overline{\textbf{x}_{b}})$$
+
+preconditioning the control variable of the variation
+
+$$\textbf{x}_{a} = \textbf{x}_{b} + \textbf{X}'_{b}\textbf{w}$$
+
+innovation
+
+$$\textbf{d} = H(\textbf{x}_{b})-\textbf{y}$$
+
+using control variable state, we can write the cost function
+
+$$J(\textbf{w}) = \frac{1}{2} \textbf{w}^{T}\textbf{w} + \frac{1}{2}(\textbf{H}\textbf{X}'_{b}\textbf{w}+\textbf{d})^{T}\textbf{O}^{-1}(\textbf{H}\textbf{X}'_{b}\textbf{w}+\textbf{d})$$
+
+where $\textbf{w}$ is the control variable and $\textbf{d}$ is an innovation. Rewriting the cost function using the background perturbation to precondition the 4DVAR control variables, we have the formulation En4DVAR cost function
+
+$$J(\textbf{w}) = \frac{1}{2} \textbf{w}^{T}\textbf{w} + \frac{1}{2}\sum_{i=0}^{I}(\textbf{HM}\textbf{X}'_{b}\textbf{w} + \textbf{d}_{i})^{T}\textbf{O}^{-1}(\textbf{HMX}'_{b}\textbf{w}+\textbf{d}_{i})$$
+
+Computing the gradient with respect to the control variables, we obtain
+
+$$\nabla_{w}J = \textbf{w} + \sum_{i=0}^{I} \textbf{X}_{b}^{'T}\textbf{M}^{T}\textbf{H}^{T}\textbf{O}^{-1}(\textbf{HMX}'_{b}\textbf{w}+\textbf{d}_{i})$$
+
+Similarly to EnKF, we use perturbation in observation space which is computed as follows in the case of EnKF,
+
+$$\textbf{HX}'_{b} \approx \frac{1}{\sqrt{N-1}}(H\textbf{x}_{b1}-\overline{H\textbf{x}_{b}},H\textbf{x}_{b2}-\overline{H\textbf{x}_{b}},.....,H\textbf{x}_{bN}-\overline{H\textbf{x}_{b}})$$
+
+we compute observation space background error
+
+$$\textbf{HMX}'_{b} \approx \frac{1}{\sqrt{N-1}}(HM\textbf{x}_{b1}-HM\overline{\textbf{x}_{b}}, HM\textbf{x}_{b2}-HM\overline{\textbf{x}_{b}},.....,HM\textbf{x}_{bN}-HM\overline{\textbf{x}_{b}} )$$
+
+hence, we have the recomputed gradient of the cost function
+
+$$\nabla _{w}J = \textbf{w} + \sum_{i=0}^{I}(\textbf{HMX}_{b}')^{T}\textbf{O}^{-1}(\textbf{HMX}_{b}'\textbf{w}+\textbf{d}_{i})$$
+
+\subsection{Intro or conclusion, who knows}
+
+One of the main advantages of En4DVAR is the relaxation of the requirement to have tangent linear model or adjoint model during the implementation. The experiments performed by ... on the shallow water demonstrated that it can  provide the results similar to those which use both with some benefits of the smaller computational cost. Moreover, En4DVAR proved to give reasonable results in comparison with 3DVAR, 4DVAR, EnKF schemes. Also, the non-sequential nature of En4DVAR also leads to the adequate data assimilation method accumulating some unbalance conditions.  
+
+\subsection{IEnKS}
+
+We define the observation vector as $\textbf{y} \in \Re^{d}$ and assume that it is obtained at every time step $\delta t$. We obtain the analysis of IEnKS over $[t, t_{l}]$ using the cost function
+
+$$\tilde{J}(w) = \frac{1}{2}(N-1)\textbf{w}^{T}\textbf{w} + \frac{1}{2}\sum_{k=1}^{L}\beta_{k}\delta_{k}^{T}(\textbf{w})\textbf{R}_{k}^{-1}\delta_{k}(\textbf{w})$$
+
+$$\delta_{k}(\textbf{w}) = \textbf{y}_{k} - H_{k}\circ M_{k\Leftarrow 0}(\textbf{x}_{0}^{(0)} + \textbf{A}_{0}\textbf{w})$$
+
+where $M_{k\Leftarrow 0}$ stands for the non-linear transition operator from $t_{0}$ to $t_{k}$, $\beta$ are weight scalars belonging to $[0,1]$. 
+
+Using the Gauss-Newton algorithm
+
+$$\textbf{w}^{j+1} = \textbf{w}^{j} - \tilde{H}_{j}^{-1} \delta \tilde{J}_{j}(\textbf{w}^{(j)})$$
+
+we can minimise the cost function iteratively starting from computing the gradient and approximating the full Hessian $\tilde{H}_{j}$,
+
+$$\nabla \tilde{J}_{(j)} = -\sum_{k=1}^{L}\beta_{k}\textbf{Y}_{k,(j)}^{T}\textbf{R}_{k}^{-1}[\textbf{y}_{k} - H_{k}\circ M_{k\Leftarrow 0}(\textbf{x}_{0}^{(j)})] + (N-1)\textbf{w}^{(j)}$$
+
+$$\tilde{H}_{j}=(N-1)\textbf{I}_{N}+\sum_{k=1}^{L} \beta_{k} \textbf{Y}_{k,(j)}^{T}\textbf{R}^{-1}_{k} \textbf{Y}_{k,(j)} $$
+
+$$\textbf{x}_{0}^{(j)} = \textbf{x}_{0}^{(0)} + \textbf{A}_{0}\textbf{w}^{(j)}$$
+
+
 \end{document}
