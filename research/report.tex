@@ -16,7 +16,6 @@
 \usepackage{empheq}
 \usepackage{color}
 \usepackage{cancel}
-\usepackage{textcomp} %% pour les intervalles d'entiers(doubles barres)
 
 %--- Structure de la page ---%
 
@@ -269,33 +268,34 @@ One of the main advantages of En4DVAR is the relaxation of the requirement to ha
 
 Here are briefly stated a few notations to understand how IEnKS works. \\
 $\textbf{E}_0 = [x_{0,[1]},...,x_{0,[N]}]$ the ensemble of N state vectors at $t_0$. \\
+$\bar{x_0} = mean\{x_{0,[i]}\}_{i \in [\![1,N]\!] }$ \\
 $\textbf{A}_0 = [x_{0,[1]} - \bar{x_0},...,x_{0,[N]}- \bar{x_0}]$. \\
 Then, the goal is to find \textbf{w} such that $x_0 = \bar{x_0} + A_0 \textbf{w}$ is the most accurate initial state vector. \\
-Hence, the below cost function is defined 
+Hence, the below cost function to be minimized is defined : 
 $$\tilde{J}(w) = \frac{1}{2}(N-1)\textbf{w}^{T}\textbf{w} + \frac{1}{2}\sum_{k=1}^{L}\beta_{k}\delta_{k}^{T}(\textbf{w})\textbf{R}_{k}^{-1}\delta_{k}(\textbf{w})$$
 
 $$\delta_{k}(\textbf{w}) = \textbf{y}_{k} - \mathcal{H}_{k}\circ \mathcal{M}_{k\leftarrow 0}(\textbf{x}_{0}^{(0)} + \textbf{A}_{0}\textbf{w})$$
 
-where $\mathcal{M}_{k\leftarrow 0}$ stands for the non-linear model operator from $t_{0}$ to $t_{k}$,% $\{\beta_k\}_{k \in [ 1, L]$ are weight scalars belonging to $[0,1]$. 
+where $\mathcal{M}_{k\leftarrow 0}$ stands for the non-linear model operator from $t_{0}$ to $t_{k}$, $\mathcal{H}_{k}$ the observation operator, $\{\beta_k\}_{k \in [\![1,L]\!]}$ are observation weights belonging to $[0,1]$. 
 
 We define the observation vector as $\textbf{y} \in \mathbb{R}^d$ and assume that it is obtained at every time step $\Delta t$. \\
 \subsubsection{Algorithm outline for one cycle}
 \paragraph{Initialization}
 \begin{itemize}
-\item transition model $\mathcal{M}_{k\leftarrow k-1}$
-\item observation operator $\mathcal{H}_{k}$
-\item $\beta_{k}$ observation weights
-\item 
+\item set of coefficients $\textbf{w}_0$
+\item define $x_0, E_0$
+\item define integers S and L, $S \le L$
 \end{itemize}
 \paragraph{Analysis step}
-Until the minimization is is satisfying enough
+Until the minimization is satisfying enough
 \begin{itemize}
+\item $x_0 = \bar{x_0} + \textbf{A}_0 \textbf{w}$
 \item propagate the state variable through $\mathcal{M}$ and $\mathcal{H}$ $L$ times.
-\item Assimilate the observations while computing the approximated gradient and hessian of the minimization process
+\item Assimilate the $L$ corresponding observations while computing the approximated gradient and hessian of the minimization process
 \item compute new minimization solution
 \end{itemize}
 \paragraph{Forecast step}
-Once the best solution for \textbf{w} has been found, one first update the initial ensemble $\textbf{E}^{*}_0 = \bar{x_0} + A_{0}w^{*}$. Then, an $S\Delta t$ forecast is achieved : $\textbf{E}^{*}_S = \mathcal{M}_{S\leftarrow 0}(\textbf{E}^{*}_0)$
+Once the best solution for \textbf{w} has been found, one first update the initial ensemble $\textbf{E}^{*}_0 = \bar{x_0} + A_{0}w^{*}$. Then, an $S\Delta t$ forecast is achieved : $\textbf{E}^{*}_S = \mathcal{M}_{S\leftarrow 0}(\textbf{E}^{*}_0)$, and will then become the background for next analysis.
 
 $$\textbf{w}^{j+1} = \textbf{w}^{j} - \tilde{H}_{j}^{-1} \delta \tilde{J}_{j}(\textbf{w}^{(j)})$$
 
