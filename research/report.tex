@@ -29,8 +29,8 @@
 \textheight 24 cm
 \pagestyle{fancy}
 \lhead[\fancyplain{}{\thepage}]{\fancyplain{}{\sl MSIAM 3A}}
-\chead[\fancyplain{}{{\sl }}]{\fancyplain{}{{Report}}}
-\rhead[\fancyplain{}{}]{\fancyplain{}{}}
+\chead[\fancyplain{}{{\sl }}]{\fancyplain{}{{}}}
+\rhead[\fancyplain{}{}]{\fancyplain{}{Report}}
 \lfoot{\fancyplain{}{}}
 \cfoot{\fancyplain{}{}}
 \cfoot{\thepage }
@@ -259,18 +259,19 @@ $$\nabla _{w}J = \textbf{w} + \sum_{i=0}^{I}(\textbf{HMX}_{b}')^{T}\textbf{O}^{-
 
 One of the main advantages of En4DVAR is the relaxation of the requirement to have tangent linear model or adjoint model during the implementation. The experiments performed by ... on the shallow water demonstrated that it can  provide the results similar to those which use both with some benefits of the smaller computational cost. Moreover, En4DVAR proved to give reasonable results in comparison with 3DVAR, 4DVAR, EnKF schemes. Also, the non-sequential nature of En4DVAR also leads to the adequate data assimilation method accumulating some unbalance conditions.  
 
-\subsection{IEnKS for Don Max}
-~~ Another data assimilation worth-considering in the context of Hybrid methods is the Iterative Ensemble Kalman Smoother(IEnKS). In fact, it belongs to the group of Ensemble Variational methods(EnVar), but its purpose is to take advantages of both filtering and variational methods :
+\subsection{IEnKS}
+~~ Another data assimilation worth-considering in the context of Hybrid methods is the Iterative Ensemble Kalman Smoother(IEnKS), applied in \cite{jointState} to joint state and parameter estimation. In fact, it belongs to the group of Ensemble Variational methods(EnVar) and so is not considered as hybrid, but its purpose is to take advantages of both filtering and variational methods :
 \begin{itemize}
 \item As an adjoint-free model, the burden of computing huge matrices derivative is avoided
-\item 
+\item flow-dependent scheme
 \end{itemize}
-
+Plus, in the IEnKS, the states ensemble propagates through model state and observation operator using Gaussian assumptions. \\
+Joint state and parameter estimation is the augmentation of the standard state vector with parameter variables of the studied system. As such parameters can be non-observable, data assimilation aims at finding covariances between them and observed data.
 Here are briefly stated a few notations to understand how IEnKS works. \\
 $\textbf{E}_0 = [x_{0,[1]},...,x_{0,[N]}]$ the ensemble of N state vectors at $t_0$. \\
 $\bar{x_0} = mean\{x_{0,[i]}\}_{i \in [\![1,N]\!] }$ \\
-$\textbf{A}_0 = [x_{0,[1]} - \bar{x_0},...,x_{0,[N]}- \bar{x_0}]$. \\
-Then, the goal is to find \textbf{w} such that $x_0 = \bar{x_0} + A_0 \textbf{w}$ is the most accurate initial state vector. \\
+$\textbf{A}_0 = [x_{0,[1]} - \bar{x_0},...,x_{0,[N]}- \bar{x_0}]$. is the first empirical moment vector.\\
+Then, the goal is to find \textbf{w} such that $x_0 = \bar{x_0} + \textbf{A}_0 \textbf{w}$ is the most accurate initial state vector. The problem has arbitraly been reduced to the vector space described by $\bar{x_0}$ and $\textbf{A}_0$ \\
 Hence, the below cost function to be minimized is defined : 
 $$\tilde{J}(w) = \frac{1}{2}(N-1)\textbf{w}^{T}\textbf{w} + \frac{1}{2}\sum_{k=1}^{L}\beta_{k}\delta_{k}^{T}(\textbf{w})\textbf{R}_{k}^{-1}\delta_{k}(\textbf{w})$$
 
@@ -279,23 +280,6 @@ $$\delta_{k}(\textbf{w}) = \textbf{y}_{k} - \mathcal{H}_{k}\circ \mathcal{M}_{k\
 where $\mathcal{M}_{k\leftarrow 0}$ stands for the non-linear model operator from $t_{0}$ to $t_{k}$, $\mathcal{H}_{k}$ the observation operator, $\{\beta_k\}_{k \in [\![1,L]\!]}$ are observation weights belonging to $[0,1]$. 
 
 We define the observation vector as $\textbf{y} \in \mathbb{R}^d$ and assume that it is obtained at every time step $\Delta t$. \\
-\subsubsection{Algorithm outline for one cycle}
-\paragraph{Initialization}
-\begin{itemize}
-\item set of coefficients $\textbf{w}_0$
-\item define $x_0, E_0$
-\item define integers S and L, $S \le L$
-\end{itemize}
-\paragraph{Analysis step}
-Until the minimization is satisfying enough
-\begin{itemize}
-\item $x_0 = \bar{x_0} + \textbf{A}_0 \textbf{w}$
-\item propagate the state variable through $\mathcal{M}$ and $\mathcal{H}$ $L$ times.
-\item Assimilate the $L$ corresponding observations while computing the approximated gradient and hessian of the minimization process
-\item compute new minimization solution
-\end{itemize}
-\paragraph{Forecast step}
-Once the best solution for \textbf{w} has been found, one first update the initial ensemble $\textbf{E}^{*}_0 = \bar{x_0} + A_{0}w^{*}$. Then, an $S\Delta t$ forecast is achieved : $\textbf{E}^{*}_S = \mathcal{M}_{S\leftarrow 0}(\textbf{E}^{*}_0)$, and will then become the background for next analysis.
 
 $$\textbf{w}^{j+1} = \textbf{w}^{j} - \tilde{H}_{j}^{-1} \delta \tilde{J}_{j}(\textbf{w}^{(j)})$$
 
@@ -307,6 +291,54 @@ $$\tilde{H}_{j}=(N-1)\textbf{I}_{N}+\sum_{k=1}^{L} \beta_{k} \textbf{Y}_{k,(j)}^
 
 $$\textbf{x}_{0}^{(j)} = \textbf{x}_{0}^{(0)} + \textbf{A}_{0}\textbf{w}^{(j)}$$
 
+The analysis in ensemble space is variational, but the gradient of the cost function is computed using the state ensemble.
+\subsubsection{Algorithm outline for one cycle}
+The idea behind the algorithm is to work with $L$ consecutive state vectors and observations, describing a Data Assimilation Window(DAW) of size $L$. Then, once the minimized solution for the background vector has been found in this DAW, the solution becomes the background itself for a $S$ steps forecast. \\
+For a standard EnKF, these values are fixed to $L = S = 1$. \\
+
+\paragraph{Initialization}
+\begin{itemize}
+\item set of coefficients $\textbf{w}_0$
+\item define $x_0, E_0$ the background
+\item define integers S and L, $S \le L$
+\end{itemize}
+\paragraph{Analysis step}
+Until the minimization is satisfying enough
+\begin{itemize}
+\item $x_0 = \bar{x_0} + \textbf{A}_0 \textbf{w}$
+\item propagate the state variable through $\mathcal{M}$ and $\mathcal{H}$ $L$ times.
+\item Assimilate the $L$ corresponding observations $\{y_{k}\}_{k \in [\![1,L]\!] }$ while computing the approximated gradient and hessian of the minimization process
+\item compute new minimization solution \textbf{w}
+\end{itemize}
+\paragraph{Forecast step}
+Once the best solution for \textbf{w} has been found, one first update the initial ensemble $\textbf{E}^{*}_0 = \bar{x_0} + A_{0}w^{*}$. Then, an $S\Delta t$ forecast is achieved : $\textbf{E}^{*}_S = \mathcal{M}_{S\leftarrow 0}(\textbf{E}^{*}_0)$, and will then become the background for next analysis.
+
+
+\subsubsection{Data assimilation monitoring}
+From above formulae and statements, one can notice that the parameters to monitor the data assimilation process are $\{\beta_k\}_{k \in [\![1,L]\!]}$, $S$ and $L$. \\
+$\forall k \in [\![1,L]\!]$, the value of $\beta_k$ stands for the importance of the observation $y_k$ in the assimilation. As an extreme value, $\beta_k = 0$ means that the data is not considered at all. \\
+Then, the choices of $S$ and $L$, for $1 \le S \le L$, define whether the assimilation is single or multiple. For $S = L$,  the DAWs do not overlap, so each observation is used once and only once. For $S < L$, there is  $L-S$ observations that intersect two consecutive DAWs, and thus are assimilated at least two times. It also means that the number of iterations increases, so a balance needs to be found, namely depending on the size of the DAWs.
+
+\subsubsection{Numerical experiments and results}
+~~ In order to emphasize the efficiency of the IEnKS, numerical experiments are achieved, conducting twin experiments together with the following Lorenz-95 model : \\
+\begin{equation*}
+\frac{dx_m}{dt} = (x_{m+1}-x_{m-2})x_{m-1} - x_m + F
+\end{equation*}
+with $x_m, m \in [\![1,M]\!]$ a variable and F the forcing parameter. \\
+\paragraph{problem setup}
+The truth state through time is noised according to the observation error covariance matrix $\textbf{R}_k$, with a fully observed system ($\mathcal{H}_k = \textbf{I}_d$) 
+Solving the dynamical system, the choice of $\Delta t$ leads to more or less strong nonlinearities. \\
+Finally, the metric to demonstrate the method accuracy is the root mean square error (RMSE) :
+$$\operatorname{RMSE}= \sqrt{\frac{\sum_{t=1}^M (x_{m}^{a} - x_{m}^{t})^2}{M}}.$$
+Using such a metric as a function of the DAW length $L$, the IEnKS -for Single DA with S=1 and S=L and Multiple DA with S=1- is meant to be compared with EnKS and 4D-Var.
+
+\paragraph{weak nonlinearity $\Delta t = 0.05$}
+In this case, for small values of $L$ ($\leq 20$), the IEnKS methods are similarly accurate, independently of $S$. Plus, they are far more efficient than EnKS and 4D-Var. \\
+However, for higher DAWs amplitudes, it turns out that 4D-Var becomes more and more accurate, so does MDA, whereas SDA errors strongly increase.
+
+\paragraph{strong nonlinearity $\Delta t = 0.20$}
+The results lead to the same conclusion as above, but the difference between MDA and 4D-Var is much more obvious.
+
 \subsection{3DVAR+EnKF}
 Here we define $\textbf{x}$ to be the model state vector, $\textbf{y}^{o}$ the set of observations, $\textbf{x}^{b}$ the background forecast, $\textbf{x}^{a}$ the analysis. We formulate the cost function for the minimiser $x$ using 3DVAR as follows,
 
@@ -317,5 +349,7 @@ $$(\textbf{I} + \textbf{BH}^{T}\textbf{R}^{-1}\textbf{H})(\textbf{x}^{a}-\textbf
 
 Under 3DVAR we use some assumptions to calculate $\textbf{B}$. Namely, (i) $\textbf{B}$ is fixed in time, (ii) $\textbf{B}$ is diagonal in horizontal spectral coefficients, i.e. $\textbf{B} = \textbf{S}\textbf{C}\textbf{S}^{T}$, where $\textbf{S}$ is the transformation for spectral coefficients to grid points (iii) $\textbf{B}$ has horizontal and vertical structures which can be separated. 
 
-
+\newpage
+\bibliographystyle{plain}
+\bibliography{report}
 \end{document}
