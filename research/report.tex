@@ -148,7 +148,7 @@ For each method described in this paper, we present some necessary for understan
 
 \section{Ensemble Hybrid methods}
 
-Since long, it had been understood that there is no possibility to derive the perfect forecast related, for example, to weather due to the fact that even small errors contained in the initial estimate grow large enough to make an attempt for the deterministic forecast useless. Epstein (1969), suggested a reasonable alternative by estimating the future states of probability density function (pdf)  of the atmosphere by the initial estimate.
+Since long, it had been understood that there is no possibility to derive the perfect forecast related, for example, to weather due to the fact that even small errors contained in the initial estimate grow large enough to make an attempt for the deterministic forecast useless. Epstein (1994) \cite{evensen}, suggested a reasonable alternative by estimating the future states of probability density function (pdf)  of the atmosphere by the initial estimate.
 
 Due to the complicated process of deriving the evolution of some complex model pdf, an ensemble forecasting (EF) has been suggested. The main idea behind EF is that each set of initial conditions and variety of numerical model options are used to generate several, individual numerical forecasts.
 
@@ -157,19 +157,19 @@ Data assimilation is the area in mathematics which is mainly arose due to the ne
 Most data assimilation methods rely heavily on the background error covariance which is assumed to be homogeneous, isotropic, stationary and quasigeostropic in its structure (Daley 1991). It also uses some parameters which are taken from the innovation statistics (Hollingsworth and
 Lonnberg 1986). While this makes the application of error covariance statistics relatively easy, it is no always appropriate, particularly under some unstable conditions.
 
-One of the approaches is to use an ensemble forecast statistics in order to obtain the background error covariances dependent on the flow (Evensen 1994). These methods are normally based on the Kalman filter theory, introduced by Kalman in 1960, which predetermined the name of ensemble Kalmna filtering (EnKF).
+One of the approaches is to use an ensemble forecast statistics in order to obtain the background error covariances dependent on the flow (Evensen 1994). These methods are normally based on the Kalman filter theory, introduced by Kalman in 1960 \cite{Kalman}, which predetermined the name of ensemble Kalmna filtering (EnKF).
 
 Ensemble Kalman Filter (EnKF) has been first introduced by Evensen (1994b) and gained its wide use due to its relatively easy concepts, formulation and implementation. For instance, there is no requirements of derivation of neither tangent linear operator nor adjoint equations, and no integration backward in time.
 
 On the other hand, variational techniques, like 3DVAR and 4DVAR, had been proven to be efficient schemes and, hence, hybrid methods using background error covariance statistics based on the ensemble and its application to variational approaches, can be the good choice.
 
 These hybrid methods had been explored by quite few authors in the recent years. For example, Lorenc (2003), examined the possibility of making the background error covariance in the variation technique flow-dependent by preconditioning the control variable by perturbation of the background ensemble forecast.  Buehner (2005), implemented similar hybrid method into the global model data assimilation system using 3DVAR. Both of these authors suggested that good results can be obtained using the mix of 4DVAR and ensemble forecasts due to the fact, that 4DVAR gains optimal trajectory using non-sequential assimilation algorithm, which is essential in some applications, e.g. satellite observations (Simmons and
-Hollingsworth 2002). 
+Hollingsworth 2002) \cite{foundation}. 
 
 This section presents the theory behind two hybrid schemes: ensemble 3DVAR and ensemble 4DVAR (En4DVAR). 
 
 \subsection{3DVAR and 4DVAR assimilations}
-This subsection is meant to give some background related to the 3D- and 4DVAR systems. In what is coming the notations based on Vialard et al. 2003 have been used.
+This subsection is meant to give some background related to the 3D- and 4DVAR systems. In what is coming the notations based on Vialard et al. 2003 \cite{general} have been used.
 
 We denote $\mathbf{w}$ as the state vector. 
 
@@ -325,7 +325,7 @@ $$J(x) = \frac{1}{2}[(x-x^{b})^{T}\textbf{B}^{-1}(\textbf{x}-\textbf{x}^{b})+(\t
 where $\textbf{B}$ is the background error covariances estimation, $\textbf{R}$ is the matrix containing observation errors and $\textbf{H}$ is the mapping operator for the model state onto the observations and  $\textbf{R}$ is the measurement error covariance. The relation between $\textbf{x}^{t}$ and $\textbf{y}^{o}$ is, thus, $$\textbf{y}^{o} = \textbf{H}\textbf{x}^{t} + \epsilon$$ where $\epsilon$ is the random vector, distributed according to the normal distribution, with zero mean and covariance matrix $\textbf{R}$. The increment $\textbf{x}^{a} - \textbf{x}^{b}$ satisfies, 
 $$(\textbf{I} + \textbf{BH}^{T}\textbf{R}^{-1}\textbf{H})(\textbf{x}^{a}-\textbf{x}^{b}) = \textbf{B}\textbf{H}^{T}\textbf{R}^{-1}(\textbf{y}^{o}-\textbf{H}\textbf{x}^{b})$$   
 
-Under 3DVAR we use some assumptions to calculate $\textbf{B}$. Namely, (i) $\textbf{B}$ is fixed in time, (ii) $\textbf{B}$ is diagonal in horizontal spectral coefficients, i.e. $\textbf{B} = \textbf{S}\textbf{C}\textbf{S}^{T}$, where $\textbf{S}$ is the transformation for spectral coefficients to grid points and $\textbf{C}$ is the diagonal matrix consisting the spectral coefficients variances (iii) $\textbf{B}$ has horizontal and vertical structures which can be separated (Hamill and Snyder, 2000).
+Under 3DVAR we use some assumptions to calculate $\textbf{B}$. Namely, (i) $\textbf{B}$ is fixed in time, (ii) $\textbf{B}$ is diagonal in horizontal spectral coefficients, i.e. $\textbf{B} = \textbf{S}\textbf{C}\textbf{S}^{T}$, where $\textbf{S}$ is the transformation for spectral coefficients to grid points and $\textbf{C}$ is the diagonal matrix consisting the spectral coefficients variances (iii) $\textbf{B}$ has horizontal and vertical structures which can be separated (Hamill and Snyder, 2000) \cite{En3DVAR}.
 
 In En3DVAR scheme, we use the following formulation to compute the sample covariance matrix $\textbf{P}^{b}$,
 
@@ -380,7 +380,7 @@ hence, we have the recomputed gradient of the cost function
 $$\nabla _{w}J = \textbf{w} + \sum_{i=0}^{I}(\textbf{HMX}_{b}')^{T}\textbf{O}^{-1}(\textbf{HMX}_{b}'\textbf{w}+\textbf{d}_{i})$$
 
 
-One of the main advantages of En4DVAR is the relaxation of the requirement to have tangent linear model or adjoint model during the implementation. The experiments performed by Hamill and Snyder (2000) on the shallow water demonstrated that it can  provide the results similar to those which use both models with some benefits of the smaller computational cost. Moreover, En4DVAR proved to give reasonable results in comparison with 3DVAR, 4DVAR, EnKF schemes. Also, the non-sequential nature of En4DVAR also leads to the adequate data assimilation method accumulating some unbalance conditions (Liu et al, 2007).  
+One of the main advantages of En4DVAR is the relaxation of the requirement to have tangent linear model or adjoint model during the implementation. The experiments performed by Hamill and Snyder (2000) on the shallow water demonstrated that it can  provide the results similar to those which use both models with some benefits of the smaller computational cost. Moreover, En4DVAR proved to give reasonable results in comparison with 3DVAR, 4DVAR, EnKF schemes. Also, the non-sequential nature of En4DVAR also leads to the adequate data assimilation method accumulating some unbalance conditions (Liu et al, 2007) \cite{En4DVAR}.  
 
 
 \subsection{IEnKS}
@@ -733,7 +733,7 @@ Since, we have only a single unknown parameter, the parameter $p^b$ is scalar an
 where $\sigma_a^2$ is the error variance.
 Combining (\ref{N} and \ref{Bpp}), the cross variance between the parameter error $\epsilon_a$ and the element $j$ of the state background error $\epsilon_u $ at time $t_{k+1}$ is expressed as
 \begin{equation}
-    B_{up}^{k+1}(j)  = \sigma_a^2  \mu ( u_j^k - u_{j-1}^k)}
+    B_{up}^{k+1}(j)  = \sigma_a^2  \mu ( u_j^k - u_{j-1}^k)
 \end{equation}
 %---------------------------------------------------------
 \subsection{Results}
@@ -810,7 +810,7 @@ The results is that when the observations are noisy, then resulting analysis and
 
 
 \item In figure \ref{noisyObs} (b),the same experience above is repeated but with the $a$ estimates being averaged over a moving time
-window of 20 timesteps.
+window of 20 timesteps. 
 
 \end{itemize}
 %---------------------------------------------------------
