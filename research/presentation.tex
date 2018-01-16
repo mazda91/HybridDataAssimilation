@@ -12,6 +12,7 @@
 \titlepage
 \end{frame}
 
+
 \begin{frame}
 \frametitle{Variational Methods}
 \pause
@@ -121,6 +122,287 @@
 	\end{itemize}
 \end{frame}
 
+%----------------------Michi Part -----------------------
+%-----------------------------------------
+\begin{frame}{Hybrid Variational}
+    Combinaison of :
+    \begin{itemize}
+        \item  Extended Kalman Filter 
+        \item  3D-Var
+    \end{itemize}
+\end{frame}
+%-----------------------------------------
+\begin{frame}{Extended Kalman Filter}
+Non-linear model
+    \begin{itemize}
+        \item State Forecast 
+        \begin{equation}
+            w_{k+1}^f = \tilde{f} (w_k^a, p_k^a)
+            \label{EKFfor}
+            \end{equation}
+        \item  Error covariance forecast
+        \begin{equation}
+        P_{k+1}^f = F_k P_k^a F_k^T
+        \label{CovEKF}
+        \end{equation}
+    where 
+            \begin{equation}
+            F_k = \big|_{w_k^a} \frac{\partial \tilde{f} }{ \partial w } = 
+            \begin{pmatrix}
+            \frac{\partial f(z,p)}{\partial w } & \frac{\partial f(z,p)}{ \partial p}\\
+            0 & I 
+            \end{pmatrix}  \big|_{{z_k^a},{ p_k^a}}
+            \label{EKFF}
+            \end{equation}
+    \end{itemize}
+\end{frame}
+%-----------------------------------------
+
+\begin{frame}{Extended Kalman Filter}
+    \begin{itemize}
+        \item Gain Matrix 
+        \begin{equation}
+        K_{k+1} = P_{k+1}^f H_{k+1}^T (H_{k+1} P_{k+1}^f H_{k+1}^T + R_{k+1}) ^{-1}
+        \end{equation}
+        where  $H_k = \big|_{w_k^a} \frac{\partial \tilde{h_k} }{ \partial w } = 
+        \begin{pmatrix}
+        \frac{\partial h_k(z,p)}{\partial w } & \frac{\partial h_k(z,p)}{ \partial p}\\
+        0 & I 
+        \end{pmatrix}  \big|_{{z_k^a},{ p_k^a}}$
+        
+        \item Analysis
+        \begin{equation}
+        w_{k+1}^a = w_{k+1}^f + K_{k+1} (y_{k+1} - H_{k+1} w_{k+1}^f)
+        \end{equation}
+
+
+        \item the analysis error covariance :
+        \begin{equation}
+            P_{k+1}^a = (I - K_{k+1} H_{k+1} ) P_{k+1}^f
+        \end{equation}
+    \end{itemize}
+\end{frame}
+%-----------------------------------------
+\begin{frame}{3D-Var}
+Goal:  
+\begin{itemize}
+    \item minimizes a cost function $J$  
+    \item Find The optimal state $w^a = \underset{w} {min} J(w)$ 
+\end{itemize}
+    J measures the misfit between the model state $w_k$ and the background state $w_a^b$ and the observation $y_k$. \\ 
+~~\\
+    
+Approaching: 
+\begin{itemize}
+        \item Cost function $J$
+        \begin{equation}
+        J(w_k) = (w_k - w_k^b)^T B_k^{-1} (w_k - w_k^b) + (y_k - \tilde h_k (w_k)) ^T R_k^{-1} (y_k - \tilde h (w_k)) 
+        \label{costFunc}
+        \end{equation}
+        $B_k$ and $R_k$ are the covariance matrices of the background and observation errors
+\end{itemize}
+
+\end{frame}
+
+%-----------------------------------------
+\begin{frame}{3D-Var}
+\begin{itemize}
+    \item Gain Matrix 
+        \begin{equation}
+        K_k =  B_k \tilde H_k^T(  \tilde H_k B_k \tilde H_k^T + R_k)^{-1}
+        \label{matrixGain3D}
+        \end{equation}
+    $\tilde H$ is the Jacobian of the observation $\tilde h_k$ evaluated at the background state $w_k^b$
+    \item Analysis solution 
+        \begin{equation}
+        w_k^a = w_k^b + K_k (y_k - \tilde H w_k^b)
+        \label{sol3D}
+        \end{equation}
+\end{itemize}
+\end{frame}
+%-----------------------------------------
+\begin{frame}{Principe of Hybrid Variational}
+\begin{itemize}
+    \item Forecast error covariance matrix  (\ref{CovEKF}) 
+        \begin{equation}
+            P_k^f = 
+        \begin{pmatrix}
+        P_{xx_k}^f  & P_{xp_k}^f \\
+        (P_{xx_k}^f)^T &  P_{pp_k}^f 
+        \end{pmatrix}  
+        \end{equation}
+        $P_{xx_k}^f $  and $P_{pp_k}^f $ are the forecast covariance matrix \\
+        $P_{xp_k}^f $ is the covariance matrix for the cross relation between the forecast errors in the state and the parameter vectors \\
+        
+    \item Error covariance forecast (\ref{CovEKF}) 
+        \begin{equation}
+        P_{k+1}^f =  
+        \begin{pmatrix}
+        M_k & N_k \\
+        0  & I
+        \end{pmatrix}
+        \begin{pmatrix}
+        P_{xx_k}^a & P_{xp_k}^a \\
+        (P_{xx_k}^a)^T &  P_{pp_k}^a
+        \end{pmatrix}
+        \begin{pmatrix}
+        M_k^T & 0 \\
+         N_k^T & I
+        \end{pmatrix}
+        \end{equation}
+        $M_k = \frac{\partial f(x,p) }{ \partial z} \big|_{x_k^a, p_k^a} $ and $N_k = \frac{\partial f(x,p)}{  \partial p } \big|_{x_k^a, p_k^a}$,
+\end{itemize}
+\end{frame}
+%-----------------------------------------
+
+\begin{frame}{Principe of Hybrid Variational}
+$P_{xx_k}^f =  B_{xx}$ ; $P_{pp_k}^f = B_{pp}$  \\
+\begin{itemize}
+            \item Forecast error covariance simplified
+                \begin{equation}
+                B_{k+1} = 
+                \begin{pmatrix}
+                B_{xx} & N_k B_{pp} \\
+                 B_{pp}N_k^T & B_{pp}
+                \end{pmatrix} 
+                \label{CovHyb}
+                \end{equation}
+\end{itemize}
+\end{frame}
+
+%-----------------------------------------
+\begin{frame}{Principe of Hybrid Variational}
+
+Analysis step : founding found by substituting the matrix (\ref{CovHyb}) into the 3D Var cost function (\ref{costFunc}) and minimizing
+
+\begin{itemize}
+            \item The gain matrix (\ref{matrixGain3D}) can now written as 
+            \begin{equation}
+            K_k   =   B_k \tilde H_k^T(  \tilde H_k B_k \tilde H_k^T + R_k)^{-1} = \begin{pmatrix}
+            K_{x_k} \\
+            K_{p_k} 
+            \end{pmatrix} 
+            \label{GainHyb}
+            \end{equation}
+    \item The state and parameter analysis (\ref{sol3D}) are given by 
+        \begin{equation}
+            x_k^a = x_k^b + K_{x_k} (y_k -  Hx_k^b) 
+        \end{equation}
+        \begin{equation}
+            p_k^a = p_k^b + K_{p_k} (y_k -  Hx_k^b)
+        \end{equation}
+    \item Then the gain matrices (\ref{GainHyb}) is expressed as 
+        \begin{equation}
+        K_{x_k} = B_{xx} H^T ( HB_{xx} H^T + R_k)^{-1}
+        \end{equation}
+        \begin{equation}
+        K_{p_k} = B_{pp} N_{k-1}^T ( HB_{xx} H^T + R_k)^{-1}
+        \end{equation}
+
+\end{itemize}
+\end{frame}
+%-----------------------------------------
+\begin{frame}{Application of Hybrid Variational}
+Linear Advection : transport of a substance by bulk motion \\
+
+\begin{itemize}
+    \item 1D linear  Model : a is the advection velocity
+\begin{equation}
+\frac{\partial(u)}{\partial t} + a \frac{\partial u}{ \partial x} = 0  
+\label{advEq}
+\end{equation}
+
+\begin{center}
+   $u(x,0) = u_0(x)  , -\infty < x < \infty$
+\end{center}
+
+The solution of (\ref{advEq}) is simply 
+\begin{equation}
+u(x,t) = u(x_0,0) = u_0(x-at)
+\label{solAdv}
+\end{equation}
+\begin{center}
+    $x_0 = x(0)$ and $x(t) = x_0 + at$
+\end{center}
+\end{itemize}
+\end{frame}
+%---------------------------------------------------
+\begin{frame}{Application of Hybrid Variational}
+\begin{itemize}
+    \item Forecast model :using upwind scheme
+            \begin{equation}
+            u_{k+1} = A  u_k 
+            \label{forecastAdv}
+            \end{equation}
+            where 
+            \[A = 
+            \begin{pmatrix}
+            (1-a\mu)  & 0&   &  &a\mu \\
+             a\mu  & (1-a\mu) & 0&  &\cdots \\
+             &\ddots & \ddots &\ddots & 0 \\
+             0 & \cdots & 0 & \mu a & (1-a\mu)
+            \end{pmatrix}
+            \]
+    \item The \textbf{augmented system model} using (\ref{forecastAdv})
+            \begin{equation}
+            w_{k+1} = f(w_k) = 
+            \begin{pmatrix}
+            A(a_k) & 0\\
+            0 & 1
+            \end{pmatrix} 
+            \begin{pmatrix}
+            u_k\\
+            a_k
+            \end{pmatrix} 
+            \label{MatrixA}
+            \end{equation}
+\end{itemize}
+\end{frame}
+%---------------------------------------------------
+\begin{frame}{Application of Hybrid Variational}
+    Since, we have only a single unknown parameter, the parameter $p^b$ is scalar and 
+    \begin{equation}
+        B_{pp} = \sigma_a^2
+    \label{Bpp}
+    \end{equation}
+    where $\sigma_a^2$ is the error variance.
+\end{frame}
+%---------------------------------------------------
+\begin{frame}{Application of Hybrid Variational}
+\begin{figure}[h]
+    \begin{center}
+    \includegraphics[width=10cm]{../Image/trueSolAdvection.png}
+    \caption{Linear advection model: true solution $u(x, t)$}
+    \label{trueSol}
+    \end{center}
+\end{figure}.
+\end{frame}
+
+%---------------------------------------------------
+\begin{frame}{Application of Hybrid Variational}
+\begin{figure}[h]
+    \begin{center}
+    \includegraphics[width=9cm]{../Image/perfectObsAdvection.png}
+    \caption{Perfect observations: parameter updates for initial estimate a = 0.87116.
+(a) Varying the spatial frequency of observations (b) Varying the temporal frequency
+of observations
+red line - observations every$25\Delta t$; solid blue line - observations every $50\Delta t$.}
+    \label{perfectObs}
+    \end{center}
+\end{figure}
+\end{frame}
+
+%---------------------------------------------------
+\begin{frame}{Frame Title}
+\begin{figure}[h]
+    \begin{center}
+    \includegraphics[width=9cm]{../Image/noisyObs.png}
+    \caption{Imperfect observations: parameter updates for initial estimate $a = 0.87116$ (a) unaveraged estimates, and (b) time averaged estimates: solid black line $\sigma_0^2 = 0.001$; solid green line $\sigma_0^2 = 0.01$; solid red line $\sigma_0^2= 0.1$}
+    \label{noisyObs}
+    \end{center}
+\end{figure}
+\end{frame}
+%---------------------------------------------------
 
 \section{Iterative Ensemble Kalman Smoother}
 \begin{frame}
