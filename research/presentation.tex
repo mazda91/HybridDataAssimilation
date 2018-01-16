@@ -14,13 +14,24 @@
 
 
 \begin{frame}
+	\frametitle{Introduction}
+	
+	\begin{itemize}
+		\item Hybrid techniques use the combination of several data assimilation methods
+		\item Advantage fo using the benefits of several methods
+		\item Better results and/or smaller computational cost
+		\item Easier implementation
+	\end{itemize}
+\end{frame}
+
+\begin{frame}
 \frametitle{Variational Methods}
-\pause
+
 \begin{definition}
 	\textbf{Data assimilation} (or data analysis) is the process by which observations of the actual system are incorporated into the model state of a numerical model of that system
 \end{definition}
 
-\pause
+
 \begin{itemize}
 	\item $\mathbf{w}$ is a state vector, $M$ is a model, $\mathbf {M} = \mathbf {M}(t_{i}, t_{i-1})$ is a linear operator related to $\delta \mathbf {w(t_{i-1})}$ and $M(t_{i},t_{i-1})$ is a non-linear model operator related to $\mathbf {w(t_{i-1})}$
 	\item $ \mathbf{w} = \mathbf {w^{b}}+\delta \mathbf {w}$
@@ -30,13 +41,12 @@
 
 
 \begin{frame}
-	\frametitle{4DVAR}
+	\frametitle{Variational Methods}
 	
-	\pause
 	\begin{itemize}
 		\item $\mathbf {w}(t_{i}) \approx M(t_{i},t_{i-1})[\mathbf {w}^{b}(t_{i-1})] + \mathbf {M}(t_{i},t_{i-1})\delta \mathbf {w}(t_{i-1})$
 		\item $\delta \mathbf {w}(t_{i}) = \mathbf {M}(t_{i},t_{i-1})\delta \mathbf {w}(t_{i-1})$
-		\item $\mathbf {w}(t_{i})=M(t_{i},t_{i-1})[\mathbf {w}(t_{i-1})]$
+	
 		\item $J(\delta \mathbf {w}) = \frac{1}{2} \delta \mathbf {w}^{T} \mathbf {B}^{-1} \delta \mathbf {w} + \frac{1}{2} \sum_{i=0}^{n}(\mathbf {G}_{i} \delta \mathbf {w} - \mathbf {d}_{i})^{T}\mathbf {R}_{i}^{-1}(\mathbf {G}_{i} \delta \mathbf {w} - \mathbf {d}_{i})$
 		where $\mathbf {B}$ and $\mathbf {R}_{i}$ are matrices with covariance estimates of background and observation error, $G_{i} = H_{i}M(t_{i},t_{0})$ being a generalized observation operator, $\mathbf {G}_{i} = \mathbf {H}_{i}\mathbf {M}(t_{i},t_{0})$ being a linear observation operator
 	\end{itemize}
@@ -55,6 +65,14 @@
 
 \begin{frame}
 	\frametitle{Kalman theory}
+	
+	\begin{definition}
+		\textbf{Kalman filter} The Kalman Filter is a sequential filter method, which
+		means that the model is integrated forward in time and,
+		whenever measurements are available, these are used to
+		reinitialize the model before the integration continues ( Evensen 2003)
+	\end{definition}
+	
 	\begin{itemize}
 		\item Analysis equation $\psi ^{a} = \psi ^{f} + \textbf{P} ^{f}\textbf{H} ^{T}(\textbf{HP} ^{f}\textbf{H} ^{T}+\textbf{R}) ^{-1}(\textbf{d-H}\psi) ^{f}$
 		\item $\textbf{P}^{a} = \textbf{P}^{f} - \textbf{P}^{f}\textbf{H}^{T}(\textbf{HP}^{f}\textbf{H}^{T}+\textbf{R})^{-1}\textbf{HP}^{f} $ 
@@ -80,6 +98,8 @@
 		and/or different numerical model configurations (Leith 1974)
 	\end{definition}
 	\begin{itemize}
+		
+		\item analysis equation $\psi ^{a} _{j}= \psi ^{f}_{j} + \textbf{P} _{e} ^{f}\textbf{H} ^{T}(\textbf{HP}_{e} ^{f}\textbf{H} ^{T}+\textbf{R}_{e}) ^{-1}(\textbf{d}_{j}-\textbf{H}\psi ^{f}_{j})$
 		
 		\item error covariance $\textbf{P}_{e}^{a} = \overline {(\psi^{a} - \overline{\psi^{a}})(\psi^{a} - \overline{\psi^{a}})^{T}} =  (\textbf{I}-\textbf{K}_{e}\textbf{H})\textbf{P}_{e}^{f}$, 
 		where $\textbf{K}_{e}$ is Kalman gain
@@ -121,6 +141,7 @@
 		
 	\end{itemize}
 \end{frame}
+
 
 %----------------------Michi Part -----------------------
 %-----------------------------------------
@@ -475,6 +496,17 @@ Then, the augmented state vector is z = (x,p)
 \begin{center}
 \includegraphics[scale=0.5]{../Image/IEnKS_forcing.png}
 \end{center}
+\end{frame}
+
+\begin{frame}
+	\frametitle{Conclusion}
+	
+	\begin{itemize}
+		\item Four hybrid methods studied
+		\item Some advantages have been discovered of using hybrid methods
+		\item Understanding of the variety of data assimilation techniques involved in the hybrid methods
+		
+	\end{itemize}
 \end{frame}
 
 \end{document}
