@@ -7,6 +7,7 @@
 \usepackage{amsthm}
 \usepackage{graphicx}
 \usepackage{hyperref}
+\numberwithin{equation}{section} 
 
 \title{InverseMethod}
 \author{Michi RAKOTONARIVO }
@@ -19,7 +20,7 @@
 The aim of the data assimilation is to combine measured observations $y_k$ with the augmented model prediction $w_k^b$ to produce an update augmented model. This optimal estimate is called the analysis and denoted $w_k^a$. Hybrid variational method combined two methods: Extended Kalman filter and 3D Var.
 
 \section{3D var}
-The 3D var method is based on maximum a posteriori estimate approahc and derives the analysis by seeking a state that minimises a cost function $J$ measuring the misfit between the emodel state $w_k$ and the background state $w_a^b$ and the observation $y_k$
+The 3D var method is based on maximum a posteriori estimate approach and derives the analysis by seeking a state that minimizes a cost function $J$ measuring the misfit between the model state $w_k$ and the background state $w_a^b$ and the observation $y_k$
 We define  the cost function as the following way:
 \begin{equation}
     J(w_k) = (w_k - w_k^b)^T B_k^{-1} (w_k - w_k^b) + (y_k - \tilde h_k (w_k)) ^T R_k^{-1} (y_k - \tilde h (w_k)) 
@@ -93,7 +94,7 @@ The Extended Kalman method is computationally much costlier than 3D Var.
 Motivated by a desire of a low cost, uncomplicated alternative is to combined ideas from 3D Var and EKF to produce a new hybrid assimilation scheme. A simplified version of EKF forecast will be used to estimate parameters forecast error covariances, which will be combined with static approximation of the state background error covariances.
 
 \subsection{Forecast step}
-As mentionned before, for this section, we will use a simplified version of EKF. We can partition the forecast error covariance matrix  (\ref{CovEKF}) as follows
+As mentioned before, for this section, we will use a simplified version of EKF. We can partition the forecast error covariance matrix  (\ref{CovEKF}) as follows
 \begin{equation}
     P_k^f = 
 \begin{pmatrix}
@@ -101,7 +102,7 @@ P_{xx_k}^f  & P_{xp_k}^f \\
 (P_{xx_k}^f)^T &  P_{pp_k}^f 
 \end{pmatrix}  
 \end{equation}
-where $P_{xx_k}^f $  and $P_{pp_k}^f $ are the forecast covariance matrix for the state $x_k$ at time $t_k$ and the parameter vector $p_k$. $P_{xp_k}^f $ is the covariance matrix for the cross relation between the forecast errors in the state ands the parameter vectors \\
+where $P_{xx_k}^f $  and $P_{pp_k}^f $ are the forecast covariance matrix for the state $x_k$ at time $t_k$ and the parameter vector $p_k$. $P_{xp_k}^f $ is the covariance matrix for the cross relation between the forecast errors in the state and the parameter vectors \\
 Using the EKF equations (\ref{EKFfor} , \ref{EKFF}), the analysis error covariance matrix is given by
 \begin{equation}
     P_k^a = 
@@ -149,7 +150,7 @@ B_{xx} & N_k B_{pp} \\
 \end{equation}
 
 \subsection{Analysis step}
-The analysis $w_k^a$ is found by substituting the matrix (\ref{CovHyb}) into the 3D Var cost function (\ref{costFunc}) and minimising. The minimum is founding numerically using a gradient descent method. \\
+The analysis $w_k^a$ is found by substituting the matrix (\ref{CovHyb}) into the 3D Var cost function (\ref{costFunc}) and minimizing. The minimum is founding numerically using a gradient descent method. \\
 The gain matrix (\ref{matrixGain3D}) can now written as 
 \begin{equation}
 K_k   =   B_k \tilde H_k^T(  \tilde H_k B_k \tilde H_k^T + R_k)^{-1} = \begin{pmatrix}
@@ -176,7 +177,7 @@ K_{p_k} = B_{pp} N_{k-1}^T ( HB_{xx} H^T + R_k)^{-1}
 
 %---------------------------------------------------------
 \section{Applications}
-To demonstrate this new hybrid method, there are three simple models: a single parameter linear advection, a two parameter linear damped oscillating system, and the three parameter non-linear Lorenz equation  which will be described.
+To demonstrate this new hybrid method, there is a simple model which is a single parameter linear advection. It will be described.
 %---------------------------------------------------------
 \subsection{Linear advection}
 %---------------------------------------------------------
@@ -197,7 +198,7 @@ u(x,t) = u(x_0,0) = u_0(x-at)
 \label{solAdv}
 \end{equation}
 where $x_0 = x(0)$ and $x(t) = x_0 + at$. \\
-We choose to solve (\ref{advEq}) for $a>0$ on a filite spatial domain $x \in [0,2]$ with the boundary condition 
+We choose to solve (\ref{advEq}) for $a>0$ on a finite spatial domain $x \in [0,2]$ with the boundary condition 
 \begin{center}
     u(t,0) = u(2,t) 
 \end{center}
@@ -253,7 +254,7 @@ a_k
 
 %---------------------------------------------------------
 \subsection{State-parameter covariance}
-To compute the cross covariances between the errors in the model state $u$ ans the parameter $a$, we need to calculate the Jacobian of the forecast mdel with respect to the model parameters. This is giben by 
+To compute the cross covariances between the errors in the model state $u$ ans the parameter $a$, we need to calculate the Jacobian of the forecast model with respect to the model parameters. This is given by 
 \begin{center}
     $N_k  = \frac{\partial (A_k u_k)}{\partial a_k} \big|_{u_k^a, a_k^a}$
 \end{center}
@@ -290,13 +291,13 @@ In this example, we will take the following parameters:
 \begin{itemize}
 \item The true advection velocity a=0.5
 \item initial parameter estimate $a_0 $is generated by adding Gaussian random noise with zero mean and variance $\sigma_a^2 = 0.1$
-\item Observations are generated by simpling the analytic solution (\ref{solAdv}) on a regularly spaced grid and are assimilated at regular time intervals
+\item Observations are generated by sampling the analytic solution (\ref{solAdv}) on a regularly spaced grid and are assimilated at regular time intervals
 \item The state background error $B_{xx}$ is kept fix
 \item The parameter background matrix $B_{pp}$ is fixed as well.
 \item The state-parameter cross variance matrix $B_{xp}$ is recalculated at each new assimilation time
 \item And at the end of each assimilation cycle, the model parameters updated
 \end{itemize}
-To characterise the \textbf{state background errors}, we use the isotropic correlation function :
+To characterize the \textbf{state background errors}, we use the isotropic correlation function :
 \begin{center}
     $b_{ij} = \sigma_b^2 \rho ^{|i-j} $
 \end{center}
@@ -304,12 +305,12 @@ where element $b_{ij}$ defines covariance between components $i$ and $j$ of stat
 The \textbf{observation error covariance matrix} is expressed as 
 $R_k = \sigma_0^2 I$ \\
 The model is runt on the domain $x \in [0,2]$.
-The true solution is shown in figure \ref{trueSol}.
-We adopt a 3D Var approach and minimise the cost function (\ref{costFunc}) iteratively using a quasi-Newton descent algorithm.
+The true solution is shown in figure \ref{trueSol} \cite{HybridSequential}.
+We adopt a 3D Var approach and minimize the cost function (\ref{costFunc}) iteratively using a quasi-Newton descent algorithm.
 
-\begin{figure}
+\begin{figure}[h]
     \begin{center}
-    \includegraphics[width=15cm]{./Image/trueSolAdvection.png}
+    \includegraphics[width=15cm]{trueSolAdvection.png}
     \caption{Linear advection model: true solution $u(x, t)$}
     \label{trueSol}
     \end{center}
@@ -319,13 +320,13 @@ We adopt a 3D Var approach and minimise the cost function (\ref{costFunc}) itera
 \subsubsection{Perfect observations}
 The value of the initial estimate $a_0$ is $a_0= 0.87116$. \\
 As the name section indicates, the observations are perfects which means that no noise is adding in the observations.
-The results is represented in the figure \ref{perfectObs}. \\
+The results is represented in the figure \ref{perfectObs} \cite{HybridSequential}.\\
 
 \begin{figure}[h]
     \begin{center}
-    \includegraphics[width=9cm]{./Image/perfectObsAdvection.png}
+    \includegraphics[width=9cm]{perfectObsAdvection.png}
     \caption{Perfect observations: parameter updates for initial estimate a = 0.87116.
-(a) Varyingthe spatial frequency of observations: solid black line - observations at $2\Delta x$ intervals; solid green line -
+(a) Varying the spatial frequency of observations: solid black line - observations at $2\Delta x$ intervals; solid green line -
 observations at $5\Delta x$ intervals; solid red line - observations at $10\Delta x$ intervals; solid blue line - observations
 at $25 \Delta x$ intervals; solid purple line - observations at $50\Delta x$ intervals. (b) Varying the temporal frequency
 of observations: solid black line - observations every $5\Delta x$; solid green line - observations every $10\Delta x$; solid
@@ -337,24 +338,24 @@ red line - observations every$25\Delta t$; solid blue line - observations every 
 \begin{itemize}
     
 
-\item  Figure \ref{perfectObs} (a) shows the effect of varying the spatial frequency of observations for the initial estimate. Observations are assimilated every $10\Delta t$, with $\sigma_0^2 = 0.01$ and grid spacings between observations range from every $2\Delta x$ to every $25\Delta x$. The scheme performs extremely well.For observations taken every $2\Delta x$, $10\Delta x$ and $25\Delta x$ the scheme recovers the true value of a to a high level of accuracy. The quality of the state analysis is also high. To every 50 and 100 , the estimates take much longer to stabilise. With observations every $100\Delta x$ the $a$ estimate gets close to but never quite settles on the true value of $a$. 
+\item  Figure \ref{perfectObs} (a) shows the effect of varying the spatial frequency of observations for the initial estimate. Observations are assimilated every $10\Delta t$, with $\sigma_0^2 = 0.01$ and grid spacing between observations range from every $2\Delta x$ to every $25\Delta x$. The scheme performs extremely well.For observations taken every $2\Delta x$, $10\Delta x$ and $25\Delta x$ the scheme recovers the true value of a to a high level of accuracy. The quality of the state analysis is also high. To every 50 and 100 , the estimates take much longer to stabilise. With observations every $100\Delta x$ the $a$ estimate gets close to but never quite settles on the true value of $a$. 
 
 \item  Figure \ref{perfectObs} (b), shows the effect of varying the temporal frequency of the observations for the same starting estimate $a_0$. Observations are taken every $5\Delta x$, and assimilated at intervals of $5\Delta t$, $10\Delta t$, $25\Delta t$ and $50\Delta t$. The results are similar to the previous experiment there is a differnce when the time when the time between successive assimilations is increased from every $5\Delta t$ to $10\Delta t$ to $25\Delta t$. For observations every $50\Delta t$ the a estimate takes slightly longer to converge. If this period is doubled again to $100\Delta t$ the scheme completely fails to recover $a$.
 \end{itemize}
 
 \subsubsection{Noisy observations}
-In this section, we add noise in the observations. The noise is defined as Gaussian with mean zero and variance $\sigma_a^2$. And the results are represented in the figure \ref{noisyObs}.
+In this section, we add noise in the observations. The noise is defined as Gaussian with mean zero and variance $\sigma_a^2$. And the results are represented in the figure \ref{noisyObs} \cite{HybridSequential}.
 \begin{figure}[h]
     \begin{center}
-    \includegraphics[width=9cm]{./Image/noisyObs.png}
+    \includegraphics[width=9cm]{noisyObs.png}
     \caption{Imperfect observations: parameter updates for initial estimate $a = 0.87116$ (a) unaveraged estimates, and (b) time averaged estimates: solid black line $\sigma_0^2 = 0.001$; solid green line $\sigma_0^2 = 0.01$; solid red line $\sigma_0^2= 0.1$}
     \label{noisyObs}
     \end{center}
 \end{figure}
 
 \begin{itemize}
-\item Figure \ref{noisyObs} (a) shows the parameter a estimates produced for error variance encreasing from $\sigma_a^2=0.001$ to $\sigma_a^2=0.1$
-The results is that when the observations are noisy, then resulting analysis and estimate parameters are also noisy. The amplitude of oscillations in $a$ encrease as $\sigma_a^2$ is increased. When the $\sigma_a^2$, the state analysis is particularly messy. The oscillations are approximately centered around a true value $a$
+\item Figure \ref{noisyObs} (a) shows the parameter a estimates produced for error variance increasing from $\sigma_a^2=0.001$ to $\sigma_a^2=0.1$
+The results is that when the observations are noisy, then resulting analysis and estimate parameters are also noisy. The amplitude of oscillations in $a$ increase as $\sigma_a^2$ is increased. When the $\sigma_a^2$, the state analysis is particularly messy. The oscillations are approximately centered around a true value $a$
 
 
 \item In figure \ref{noisyObs} (b),the same experience above is repeated but with the $a$ estimates being averaged over a moving time
@@ -362,8 +363,6 @@ window of 20 timesteps.
 
 \end{itemize}
 %---------------------------------------------------------
-\section{Nonlinear oscillator}
-\section{Lorenz equations}
 
 
 
@@ -375,5 +374,12 @@ data and have a direct influence on the quality of the analysis
 
 As the results obtained showed, the scheme performed well in all of the three
 cases considered and was successful in recovering the parameter values we had specified to a good level of accuracy, even when the observational data were noisy. This had a positive impact on the skill of the forecast model and enabled more accurate predictions of the true model state.
+
+
+%\section*{Bibliographie}
+\addcontentsline{toc}{section}{Bibliography}
+\bibliographystyle{plain}
+\nocite{*}
+\bibliography{biblio}
 \end{document} 
 
