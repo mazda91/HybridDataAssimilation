@@ -135,11 +135,100 @@
 
 \maketitle
 
-\section{KseniaDRaft}
-\subsection{EnKF}
+\section{Ksenia}
+\section{Ensemble Hybrid methods}
+
+Since long, it had been understood that there is no possibility to derive the perfect forecast related to weather, for example, due to the fact that even small errors contained in the initial estimate grow large enough to make an attempt for the deterministic forecast useless. Epstein (1969), suggested a reasonable alternative by estimating the future states of probability density function (pdf)  of the atmosphere by the initial estimate.
+
+Due to the complicated process of deriving the evolution of some complex model pdf, an ensemble forecasting (EF) has been suggested. The main idea behind EF is that each set of initial conditions and variety of numerical model options are used to generate several, individual numerical forecasts.
+
+Data assimilation is the area in mathematics which is mainly arose due to the necessary developments in weather forecast processes. These processes require the numerical models initialization based on the relatives sparse observation information.  
+
+Most data assimilation methods rely heavily on the background error covariance which is assumed to be homogeneous, isotropic, stationary and quasigeostropic in its structure (Daley 1991). It also uses some parameters which are taken from the innovation statistics (Hollingsworth and
+Lonnberg 1986). While this makes the application of error covariance statistics relatively easy, it is no always appropriate, particularly under some unstable conditions.
+
+One of the approaches is to use an ensemble forecast statistics in order to obtain the background error covariances dependent on the flow (Evensen 1994). These methods are normally based on the Kalman filter theory, introduced by Kalman in 1960, which predetermined the name of ensemble Kalmna filtering (EnKF).
+
 Ensemble Kalman Filter (EnKF) has been first introduced by Evensen (1994b) and gained its wide use due to its relatively easy concepts, formulation and implementation. For instance, there is no requirements of derivation of neither tangent linear operator nor adjoint equations, and no integration backward in time.
 
-The Kalman Filter is a method where the model requires only forward integration in time and it reinitialised every time the measurements are available. Hereafter, we use the following notations: $\psi^{f}$ is the model forecast, $\psi^{a}$ is the model analysis, $\textbf{d}$ is the vector containing the measurements, $\textbf{P}^{f}$ is the covariance for the model forecast, $\textbf{P}^{a}$ is the covariance for the model analysis and $\textbf{R}$ is the covariance for the model measurements, $\textbf{H}$ is the measurement operator relating to the true model state $\psi ^{t}$ to $\textbf{d}$ with possibility to have the measurement errors $\epsilon$. We now state the analysis equation:
+On the other hand, variational techniques, like 3DVAR and 4DVAR, had been proven to be efficient schemes and, hence, hybrid methods using background error covariance statistics based on the ensemble and its application to variational approaches, can be the good choice.
+
+These hybrid methods had been explored by quite few authors in the recent years. For example, Lorenc (2003), examined the possibility of making the background error covariance in the variation technique flow-dependent by preconditioning the control variable by perturbation of the background ensemble forecast.  Buehner (2005), implemented similar hybrid method into the global model data assimilation system using 3DVAR. Both of these authors suggested that good results can be obtained using the mix of 4DVAR and ensemble forecasts due to the fact, that 4DVAR gains optimal trajectory using non-sequential assimilation algorithm, which is essential in some applications, e.g. satellite observations (Simmons and
+Hollingsworth 2002). 
+
+This section presents the theory behind two hybrid schemes: ensemble 3DVAR and ensemble 4DVAR (En4DVAR). 
+
+\subsection{3DVAR and 4DVAR assimilations}
+This subsection is meant to give some background,  related to the 3D- and 4DVAR systems. In what is coming the notations based on Vialard et al. 2003 have been used.
+
+We denote $\mathbf{w}$ as the state vector. 
+
+Observations produce estimates of model unknowns which are then used to formulate the analysis $\mathbf{w^{a}}$. Previous analysis is used to generate background state $\mathbf{w^b}$. The background state is assumed to be relatively close to the state which we consider to be "true" and we can write the state vector $\mathbf {w}$ in terms background state and increment $\delta \mathbf {w}$:
+\begin{align}
+\mathbf{w} = \mathbf {w^{b}}+\delta \mathbf {w}
+\end{align} 
+
+Denoting $M$ as a model, $\mathbf {M} = \mathbf {M}(t_{i}, t_{i-1})$ as a linear operator related to $\delta \mathbf {w(t_{i-1})}$ and $M(t_{i},t_{i-1})$ as a nonlinear model operator related to $\mathbf {w(t_{i-1})}$, we can write the relation between the vector $\mathbf {w}$ and model $M$ acting on $w$ over the time interval $[t_{i-1},t_{i}]$:
+
+\begin{align}
+\mathbf {w}(t_{i})=M(t_{i},t_{i-1})[\mathbf {w}(t_{i-1})]
+\end{align}
+
+We now substitute (1) into (2) and obtain 
+\begin{align}
+\mathbf {w}(t_{i}) \approx M(t_{i},t_{i-1})[\mathbf {w}^{b}(t_{i-1})] + \mathbf {M}(t_{i},t_{i-1})\delta \mathbf {w}(t_{i-1})
+\end{align}
+
+We then can define the increment prognostic model as following:
+
+\begin{align}
+\delta \mathbf {w}(t_{i}) = \mathbf {M}(t_{i},t_{i-1})\delta \mathbf {w}(t_{i-1})
+\end{align}
+
+Next, we denote $\mathbf {y}_{i}^{o}$ as the observation vector at $t_{i}$ and $H_{i}$ as the observation operator at $t_{i}$. We now can write the model relation of $H_{i}$ acting on $w$ at $t_{i}$:
+
+\begin{align}
+H_{i}[\mathbf {w}(t_{i})] \approx H_{i}[\mathbf {w}^{b}(t_{i})]+\mathbf {H}_{i}\delta \mathbf {w}(t_{i})
+\end{align}
+
+In what is to follow, we assume that observation vectors are available over $t_{0}\leq t_{i} \leq t_{n}$, $G_{i} = H_{i}M(t_{i},t_{0})$ being a generalized observation operator, $\mathbf {G}_{i} = \mathbf {H}_{i}\mathbf {M}(t_{i},t_{0})$ being a linear observation operator and hence, there is direct relation between the observation estimates and initial conditions:
+
+\begin{align}
+H_{i}[\mathbf {w}(t_{i})]=G_{i}[\mathbf {w}(t_{0})] \approx G_{i}[\mathbf {w}^{b}(t_{0})] + \mathbf {G}_{i}\delta \mathbf {w}(t_{0})
+\end{align}
+
+The 4DVAR system uses the analysis $\mathbf {w}^{a}=\mathbf {w}^{a}(t_{0})$ which simultaneously minimizes the distance to $\mathbf {w}^{b} = \mathbf {w}^{b}(t_{0})$ and to the observations $\mathbf {y}_{i}^{o}$ over the period $t_{0}\leq t_{i} \leq t_{n}$. We define the distance as an inner product $J^{F}$ where observations and accuracy taken into account, as the function of increment $\delta \mathbf {w} = \delta \mathbf {w}(t_{0})$:
+
+\begin{align}
+J^{F}(\delta \mathbf {w}) = \frac{1}{2} \delta \mathbf {w}^{T} \mathbf {B}^{-1} \delta \mathbf {w} + \frac{1}{2} \sum_{i=0}^{n}[G_{i}(\mathbf {w}^{b}+\delta \mathbf {w})-\mathbf {y}_{i}^{o}]^{T}R_{i}^{-1}[G_{i}(\mathbf {w}^{b} + \delta \mathbf {w}) - y_{i}^{o}]
+\end{align}
+
+where $\mathbf {B}$ and $\mathbf {R}_{i}$ are matrices with covariance estimates of background and observation error. We denote the background term which measures the fitting to $w^{b}$, $J_{b}$:
+
+$$J_{b}=\frac{1}{2} \delta \mathbf {w}^{T} \mathbf {B}^{-1} \delta \mathbf {w}$$ 
+
+and  the observation, $J_{o}^{F}$, which measures the fit between observation and model equivalent. 
+
+$$J_{o}^{F}=\frac{1}{2} \sum_{i=0}^{n}[G_{i}(\mathbf {w}^{b}+\delta \mathbf {w})-\mathbf {y}_{i}^{o}]^{T}R_{i}^{-1}[G_{i}(\mathbf {w}^{b} + \delta \mathbf {w}) - y_{i}^{o}]$$
+
+The analysis can be written as $\mathbf {w}{a} = \mathbf {w}^{b}+\delta \mathbf {w}^{a}$ and $\delta w^{a}$ is the minimization increment for $J^{F}$.
+
+To make minimization procedure more simple and make it possible to find not many minima which come from the nonlinear component $G_{i}$ but unique one, Courtier et al. (1994) suggests to approximate $J^{F}$ by quadratic cost function $J$ using the linear operator $\mathbf {G}_{i}$:
+
+\begin{align}
+J(\delta \mathbf {w}) = \frac{1}{2} \delta \mathbf {w}^{T} \mathbf {B}^{-1} \delta \mathbf {w} + \frac{1}{2} \sum_{i=0}^{n}(\mathbf {G}_{i} \delta \mathbf {w} - \mathbf {d}_{i})^{T}\mathbf {R}_{i}^{-1}(\mathbf {G}_{i} \delta \mathbf {w} - \mathbf {d}_{i})
+\end{align}
+where $$J_{o} = \frac{1}{2} \sum_{i=0}^{n}(\mathbf {G}_{i} \delta \mathbf {w} - \mathbf {d}_{i})^{T}\mathbf {R}_{i}^{-1}(\mathbf {G}_{i} \delta \mathbf {w} - \mathbf {d}_{i})$$,
+
+$$J_{b} = \frac{1}{2} \delta \mathbf {w}^{T} \mathbf {B}^{-1} \delta \mathbf {w}$$, and 
+
+$\mathbf {d}_{i}$ stands for effective observation vector.
+
+The main difference between 3DVAR and 4DVAR comes from the choice of $\mathbf{M}$ to obtain the linearized observation operator $\mathbf {G}_{i}$. While 3DVAR model simply uses $\mathbf {M} = \mathbf {I}$, where $\mathbf {I}$ corresponds to the identity matrix, i.e. we have persistence model, 4DVAR has $\mathbf {M} \approx (\partial M/\partial \mathbf {w})|_{w-w^{b}}$.
+
+\subsection{Kalman filtering}
+This section presents briefly the Kalman theory main principles.
+The Kalman Filter is a method where the model requires only forward integration in time and it reinitialised every time the measurements are available. Here we use the following notations: $\psi^{f}$ is the model forecast, $\psi^{a}$ is the model analysis, $\textbf{d}$ is the vector containing the measurements, $\textbf{P}^{f}$ is the covariance for the model forecast, $\textbf{P}^{a}$ is the covariance for the model analysis and $\textbf{R}$ is the covariance for the model measurements, $\textbf{H}$ is the measurement operator relating to the true model state $\psi ^{t}$ to $\textbf{d}$ with possibility to have the measurement errors $\epsilon$. We now state the analysis equation:
 
 $$\psi ^{a} = \psi ^{f} + \textbf{P} ^{f}\textbf{H} ^{T}(\textbf{HP} ^{f}\textbf{H} ^{T}+\textbf{R}) ^{-1}(\textbf{d-H}\psi) ^{f}$$
 
@@ -151,7 +240,7 @@ and
 
 $$\textbf{d} = \textbf{H}\psi{t} + \epsilon$$
 
-We determine the reinitialisation $\psi{a}$ as a weighted linear combination of $\psi{f}$, $\textbf{P}^{f}$ and $\textbf{H}^{T}$. We can calculate the weights using the error covariance for the model prediction projected onto the measurements, the measurement error covariance and the innovation (i.e. the difference between prediction and measurements).     
+We determine the reinitialisation $\psi^{a}$ as a weighted linear combination of $\psi^{f}$, $\textbf{P}^{f}$ and $\textbf{H}^{T}$. We can calculate the weights using the error covariance for the model prediction projected onto the measurements, the measurement error covariance and the innovation (i.e. the difference between prediction and measurements).     
 
 We next define the Kalman gain matrix which is used to solve the equations related to the time evolution of the error covariance matrix of the model state
 
@@ -168,7 +257,8 @@ $$\psi_{k+1}=\textbf{f}(\psi_{k})$$
 
 we obtain the Extended Kalman Filter with $\textbf{F}$ being the tangent linear operator, i.e. Jacobian, of $\textbf{f}(\psi)$.
 
-We now switch to the ensemble Kalman filter presentation. We first define the error statistics using an ensemble of model states, then an alternative definition of the error covariance equation to predict the error statistics and lastly, we present relevant analysis scheme.
+\subsection{Ensemble Kalman filter}
+We now switch to the ensemble Kalman filter presentation.
 
 We use the true state to define the error covariance matrices for $\textbf{P}^{f}$ and $\textbf{P}^{a}$ using the expectation value 
 
@@ -212,30 +302,54 @@ $$\psi_{j}^{a}-\overline{\psi}^{a} = (\textbf{I}-\textbf{K}_{e}\textbf{H})(\psi_
 
 and we derive the error covariance as follows,
 
-$$\textbf{P}_{e}^{a} = \overline {(\psi^{a} - \overline{\psi{a}})(\psi{a} - \overline{\psi^{a}})^{T}} = (\textbf{I}-\textbf{K}_{e}\textbf{H})\textbf{P}_{e}^{f}(\textbf{I}-\textbf{H}^{T}\textbf{K}_{e}^{T})+\textbf{K}_{e}\textbf{R}_{e}\textbf{K}_{e}^{T}=\textbf{P}_{e}^{f} - \textbf{K}_{e}\textbf{H}\textbf{P}_{e}^{f} - \textbf{P}_{e}^{f}\textbf{H}^{T}\textbf{K}_{e}^{T} + \textbf{K}_{e}(\textbf{H}\textbf{P}_{e}^{f}\textbf{H}^{T}+\textbf{R}_{e})\textbf{K}_{e}^{T} = (\textbf{I}-\textbf{K}_{e}\textbf{H})\textbf{P}_{e}^{f}$$ 
+$$\textbf{P}_{e}^{a} = \overline {(\psi^{a} - \overline{\psi{a}})(\psi{a} - \overline{\psi^{a}})^{T}} = (\textbf{I}-\textbf{K}_{e}\textbf{H})\textbf{P}_{e}^{f}(\textbf{I}-\textbf{H}^{T}\textbf{K}_{e}^{T})+\textbf{K}_{e}\textbf{R}_{e}\textbf{K}_{e}^{T}=$$$$\textbf{P}_{e}^{f} - \textbf{K}_{e}\textbf{H}\textbf{P}_{e}^{f} - \textbf{P}_{e}^{f}\textbf{H}^{T}\textbf{K}_{e}^{T} + \textbf{K}_{e}(\textbf{H}\textbf{P}_{e}^{f}\textbf{H}^{T}+\textbf{R}_{e})\textbf{K}_{e}^{T} =$$$$ (\textbf{I}-\textbf{K}_{e}\textbf{H})\textbf{P}_{e}^{f}$$ 
 
 The last expression is the Kalman filter minimum variance error covariance. Thus, if we have infinite number of ensembles, the ensemble Kalman filter provides the same result as Kalman filter and extended Kalman filter.
 
-\subsection{Incremental 4DVAR}
-copy from the internship report
+\subsection{En3DVAR}
+This subsection presents the hybrid method based on the 3D variational schemes combined with EnKF.
+Here we define $\textbf{x}$ to be the model state vector, $\textbf{y}^{o}$ the set of observations, $\textbf{x}^{b}$ the background forecast, $\textbf{x}^{a}$ the analysis. We formulate the cost function for the minimiser $x$ using 3DVAR as follows,
+
+$$J(x) = \frac{1}{2}[(x-x^{b})^{T}\textbf{B}^{-1}(\textbf{x}-\textbf{x}^{b})+(\textbf{y}^{o}-\textbf{H}\textbf{x})^{T}\textbf{R}^{-1}(\textbf{y}^{o}-\textbf{Hx})]$$
+
+where $\textbf{B}$ is the background error covariances estimation, $\textbf{R}$ is the matrix containing observation errors and $\textbf{H}$ is the mapping operator for the model state onto the observations and  $\textbf{R}$ is the measurement error covariance. The relation between $\textbf{x}^{t}$ and $\textbf{y}^{o}$ is, thus, $$\textbf{y}^{o} = \textbf{H}\textbf{x}^{t} + \epsilon$$ where $\epsilon$ is the random vector, distributed according to the normal distribution, with zero mean and covariance matrix $\textbf{R}$. The increment $\textbf{x}^{a} - \textbf{x}^{b}$ satisfies, 
+$$(\textbf{I} + \textbf{BH}^{T}\textbf{R}^{-1}\textbf{H})(\textbf{x}^{a}-\textbf{x}^{b}) = \textbf{B}\textbf{H}^{T}\textbf{R}^{-1}(\textbf{y}^{o}-\textbf{H}\textbf{x}^{b})$$   
+
+Under 3DVAR we use some assumptions to calculate $\textbf{B}$. Namely, (i) $\textbf{B}$ is fixed in time, (ii) $\textbf{B}$ is diagonal in horizontal spectral coefficients, i.e. $\textbf{B} = \textbf{S}\textbf{C}\textbf{S}^{T}$, where $\textbf{S}$ is the transformation for spectral coefficients to grid points and $\textbf{C}$ is the diagonal matrix consisting the spectral coefficients variances (iii) $\textbf{B}$ has horizontal and vertical structures which can be separated.
+
+In En3DVAR scheme, we use the following formulation to compute the sample covariance matrix $\textbf{P}^{b}$,
+
+$$\textbf{B} = (1 - \alpha)\textbf{P}^{b} + \alpha \textbf{S}\textbf{C}\textbf{S}^{T}$$
+
+To compute $\textbf{P}^{b}$ in this way, we have an option to change the analysis from only flow-dependent, ensemble-based error covariances to original 3DVAR covariances by changing $\alpha$ from 0.0 to 1.0.
+
+Implementation of the hybrid scheme requires to perform adequate ensemble. This procedure is firstly, to use each ensemble member for the background forecast in analysis increment formulation and update it using some perturbed observations. To use this scheme, there are several approaches to calculate $\textbf{P}^{b}$. First one, and the easiest, is to treat $\textbf{P}^{b}$ as the sample covariance matrix based on the whole ensemble and update each member by the same background covariance. However, this way does not have sufficient performance in estimation of the background errors variance, which also leads to the weak performance of the EnKF. This can be avoided by using double EnKF, where we split the ensemble by two and use the sample covariance from one set to update the second one. Second approach, is to calculate $\textbf{P}^{b}$ for the $i$th member based on the sample which does not have this member, 
+
+$$\textbf{P}^{b}_{i} = (n-2)^{-1} \sum_{j=1, j \ne i}^{n}(\textbf{x}_{j}^{b} - \overline{\textbf{x}}_{i}^{b})(\textbf{x}_{j}^{b} - \overline{\textbf{x}}_{i}^{b})^{T}$$
+
+where $n$ is the number of ensembles and  $\textbf{x}_{i}^{b}$ is the ensemble mean.
+
+This hybrid technique gives an advantage to provide some reduction in analysis errors comparing with 3DVAR standing alone.
 
 \subsection{En4DVAR algorithm}
 
+En4DVAR scheme is essentially a combination between EnKF and 4DVAR schemes. Unlike traditional Kalman filter, EnKF is using Monte Carlo approach to approximate the covariance of the forecast error. Noting the number of ensemble members by $N$ and the state vector by $\textbf{x}$, we estimate the background error as following,
+
 $$\textbf{X}'_{b}=\frac{1}{\sqrt{N-1}}(\textbf{x}_{b1}-\overline{\textbf{x}_{b}},\textbf{x}_{b2}-\overline{\textbf{x}_{b}},......,\textbf{x}_{bN}-\overline{\textbf{x}_{b}})$$
 
-preconditioning the control variable of the variation
+Next, we precondition the control variable of the variation,
 
 $$\textbf{x}_{a} = \textbf{x}_{b} + \textbf{X}'_{b}\textbf{w}$$
 
-innovation
+with innovation,
 
 $$\textbf{d} = H(\textbf{x}_{b})-\textbf{y}$$
 
-using control variable state, we can write the cost function
+Using control variable state $\textbf{w}$, we can write the cost function
 
 $$J(\textbf{w}) = \frac{1}{2} \textbf{w}^{T}\textbf{w} + \frac{1}{2}(\textbf{H}\textbf{X}'_{b}\textbf{w}+\textbf{d})^{T}\textbf{O}^{-1}(\textbf{H}\textbf{X}'_{b}\textbf{w}+\textbf{d})$$
 
-where $\textbf{w}$ is the control variable and $\textbf{d}$ is an innovation. Rewriting the cost function using the background perturbation to precondition the 4DVAR control variables, we have the formulation En4DVAR cost function
+where innovation $\textbf{d}$ is . Rewriting the cost function using the background perturbation to precondition the 4DVAR control variables, we have the formulation En4DVAR cost function
 
 $$J(\textbf{w}) = \frac{1}{2} \textbf{w}^{T}\textbf{w} + \frac{1}{2}\sum_{i=0}^{I}(\textbf{HM}\textbf{X}'_{b}\textbf{w} + \textbf{d}_{i})^{T}\textbf{O}^{-1}(\textbf{HMX}'_{b}\textbf{w}+\textbf{d}_{i})$$
 
@@ -255,9 +369,9 @@ hence, we have the recomputed gradient of the cost function
 
 $$\nabla _{w}J = \textbf{w} + \sum_{i=0}^{I}(\textbf{HMX}_{b}')^{T}\textbf{O}^{-1}(\textbf{HMX}_{b}'\textbf{w}+\textbf{d}_{i})$$
 
-\subsection{Intro or conclusion, who knows}
 
-One of the main advantages of En4DVAR is the relaxation of the requirement to have tangent linear model or adjoint model during the implementation. The experiments performed by ... on the shallow water demonstrated that it can  provide the results similar to those which use both with some benefits of the smaller computational cost. Moreover, En4DVAR proved to give reasonable results in comparison with 3DVAR, 4DVAR, EnKF schemes. Also, the non-sequential nature of En4DVAR also leads to the adequate data assimilation method accumulating some unbalance conditions.  
+One of the main advantages of En4DVAR is the relaxation of the requirement to have tangent linear model or adjoint model during the implementation. The experiments performed by Hamill and Snyder (2000) on the shallow water demonstrated that it can  provide the results similar to those which use both models with some benefits of the smaller computational cost. Moreover, En4DVAR proved to give reasonable results in comparison with 3DVAR, 4DVAR, EnKF schemes. Also, the non-sequential nature of En4DVAR also leads to the adequate data assimilation method accumulating some unbalance conditions.  
+
 
 \subsection{IEnKS}
 ~~ Another data assimilation worth-considering in the context of Hybrid methods is the Iterative Ensemble Kalman Smoother(IEnKS), applied in \cite{jointState} to joint state and parameter estimation. In fact, it belongs to the group of Ensemble Variational methods(EnVar) and so is not considered as hybrid, but its purpose is to take advantages of both filtering and variational methods :
