@@ -2,7 +2,7 @@
 \usepackage{graphics}
 %\usepackage[latin1]{inputenc}
 \usetheme{CambridgeUS}
-\title[Wave filtering for ocean modeling]{Inverse methods: Hybrid Data Assimilation}
+\title[Research articles]{Inverse methods: Hybrid Data Assimilation}
 \author{Ksenia Kozhanova, Maxime Mazouth--Laurol, Michi Rakotonarivo}
 \institute{Grenoble INP, MSIAM 2}
 \date{January, 2018}
@@ -119,6 +119,80 @@
 		\item appropriate data assimilation method due to the non-sequential nature
 		
 	\end{itemize}
+\end{frame}
+
+
+\section{Iterative Ensemble Kalman Smoother}
+\begin{frame}
+\frametitle{Statements}
+The Iterative Ensemble Kalman Smoother(IEnKS) follows the same scheme than standard Ensemble Kalman Filter :
+\begin{itemize}
+\item Ensemble forecast
+\item Analysis
+\item Posterior ensemble generation
+\end{itemize}
+
+But there are differences :
+\begin{itemize}
+\item  Analysis is variational
+\item  Gradient of the cost function approximated using the ensemble
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Algorithm}
+\begin{itemize}
+\item $L$ : size of the Data Assimilation Window(DAW)
+\item $S$ : number of forecast steps
+\end{itemize}
+\begin{center}
+\includegraphics[scale=0.5]{../Image/IEnKS_chaining.png} 
+\end{center}
+Here, $L=5$ and $S=2$.
+\end{frame}
+
+
+\begin{frame}
+\frametitle{Data assimilation monitoring}
+The defined cost function :
+$$\tilde{J}(w) = \frac{1}{2}(N-1)\textbf{w}^{T}\textbf{w} + \frac{1}{2}\sum_{k=1}^{L}\beta_{k}\delta_{k}^{T}(\textbf{w})\textbf{R}_{k}^{-1}\delta_{k}(\textbf{w})$$
+
+\begin{itemize}
+\item $\{\beta_k\}_{k \in [\![1,L]\!]}$ : observation weights
+\item $L$ and $S$ : Overlap between consecutive DAWs.
+\end{itemize}
+\end{frame}
+
+\begin{frame}
+\frametitle{Numerical experiment}
+\textbf{Problem statement} \\
+Twin experiments together with the following Lorenz-95 model : \\
+\begin{equation*}
+\frac{dx_m}{dt} = (x_{m+1}-x_{m-2})x_{m-1} - x_m + F
+\end{equation*}
+with $x_m, m \in [\![1,M]\!]$ a variable and F the forcing parameter. \\
+
+\textbf{Measurement metric}
+$$\operatorname{RMSE}= \sqrt{\frac{\sum_{t=1}^M (x_{m}^{a} - x_{m}^{t})^2}{M}}.$$
+\end{frame}
+\begin{frame}
+\frametitle{Overview of the results}
+\framesubtitle{Parameter F known}
+\includegraphics[width=\paperwidth,height=\paperheight]{../Image/IEnKS_weak.png}
+
+\end{frame}
+
+\begin{frame}
+\frametitle{Augmented state principle}
+\begin{itemize}
+\item state vector $\textbf{x} \in \mathbb{R}^M$
+\item vector of parameters $\textbf{p} \in \mathbb{R}^P$
+\end{itemize}
+
+Then, the augmented state vector is z = (x,p) 
+\begin{center}
+\includegraphics[scale=0.5]{../Image/IEnKS_forcing.png}
+\end{center}
 \end{frame}
 
 \end{document}
